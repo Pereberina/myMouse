@@ -1,0 +1,71 @@
+;
+; myMouse.inf
+;
+
+
+[Version]
+Signature="$Windows NT$"
+Class=Mouse
+ClassGUID={4D36E96F-E325-11CE-BFC1-08002BE10318}
+Provider=%ManufacturerName%
+DriverVer=01/11/2017
+CatalogFile=myMouse.cat
+
+[DestinationDirs]
+DefaultDestDir = 12
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+myMouse.sys = 1,,
+
+[Manufacturer]
+%ManufacturerName%=Standard,NT$ARCH$
+
+[Standard.NT$ARCH$]
+%MouseDesc% = myMouse, HID_DEVICE_SYSTEM_MOUSE
+
+
+[myMouse]
+Include=msmouse.inf
+Needs=HID_Mouse_Inst.NT
+CopyFiles=myMouse.CopyFiles
+
+
+[myMouse.CopyFiles]
+myMouse.sys
+
+
+[myMouse.Services]
+AddService = myMouse,  , myMouse_Service_Inst
+Include=MSMOUSE.INF
+Needs=HID_Mouse_Inst.NT.Services
+
+[myMouse_Service_Inst]
+DisplayName    = %myMouse.SvcDesc%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 3                  ; SERVICE_DEMAND_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+LoadOrderGroup = Pointer Port
+ServiceBinary  = %12%\myMouse.sys
+
+[myMouse.HW]
+; Add the device upper filter
+AddReg = myMouse.HW.AddReg
+
+; run the directives need by the port driver
+Include=MSMOUSE.INF
+Needs=HID_Mouse_Inst.NT.HW
+
+[myMouse.HW.AddReg]
+HKR,,"UpperFilters",0x00010008,"myMouse"
+
+
+
+[Strings]
+ManufacturerName="Stasia"
+DiskName="Stasia Mouse Filter Installation Disk"
+MouseDesc = "Stasia Filtered USB Mouse Device"
+myMouse.SvcDesc="Mouse Filter"
+CLASSKEY = System\CurrentControlSet\Control\Class\ClassGuid
